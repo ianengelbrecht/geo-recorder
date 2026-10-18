@@ -17,7 +17,7 @@ export default defineConfig({
       // for more information about preprocessors
       preprocess: vitePreprocess(),
       adapter: adapter({ fallback: '404.html' }),
-      paths: { base: process.env.BASE_PATH || '' }
+      paths: { base: (process.env.BASE_PATH || '') as '' | `/${string}` }
     })
   ],
   define: { __APP_VERSION__: JSON.stringify(version) }
