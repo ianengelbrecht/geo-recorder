@@ -1,4 +1,5 @@
 <script lang="ts">
+import { asset  } from '$app/paths';
   import '../app.css';
   import { SvelteToast } from '@zerodevx/svelte-toast'
 	
@@ -32,7 +33,7 @@
 <div class="flex gap-4 items-center">
   v{__APP_VERSION__}
   <a href="https://github.com/ianengelbrecht/geo-recorder" target="_blank">
-    <img src="/github-dark.png" alt="View on GitHub" class="h-8 w-8" >
+    <img src={asset('github-dark.png')} alt="View on GitHub" class="h-8 w-8" />
   </a>
 </div>
 </div>
