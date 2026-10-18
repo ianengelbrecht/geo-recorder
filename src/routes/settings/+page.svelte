@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { settings } from '../../types'
   import {goto} from '$app/navigation'
+  import { resolve } from '$app/paths';
 
   const formatOptions = [ 'DD', 'DM', 'DMS' ]
   const gridOptions =['QDS']
@@ -17,7 +18,7 @@
   
   const saveSettings = () => {
     localStorage.setItem('geoSettings', JSON.stringify(geoSettings))
-    goto('/')
+    goto(resolve('/'))
   }
 
   let edits = false
