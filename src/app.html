@@ -8,10 +8,28 @@
     <meta name="theme-color" content="#0f172a" />
     <link rel="manifest" href="manifest.json" />
     <title>Geo Recorder</title>
+    <script>
+      (function() {
+        try {
+          const savedTheme = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+          const metaTheme = document.querySelector('meta[name="theme-color"]');
+          if (metaTheme) {
+            metaTheme.setAttribute('content', isDark ? '#0f172a' : '#ffffff');
+          }
+        } catch (_) {}
+      })();
+    </script>
 		%sveltekit.head%
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon=close&icon=arrow_back" />
 	</head>
-	<body data-sveltekit-preload-data="hover" class="bg-slate-900 text-white min-h-screen">
+	<body data-sveltekit-preload-data="hover" class="bg-white text-slate-900 dark:bg-slate-900 dark:text-white min-h-screen">
 		<div style="display: contents" class="flex flex-col">%sveltekit.body%</div>
 	</body>
 </html>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	
   import '../app.css';
   import { SvelteToast } from '@zerodevx/svelte-toast'
 	
@@ -23,21 +22,13 @@
   }
 </script>
 
-<div class="h-vh flex flex-col">
-
-  <nav class="bg-slate-800 p-4 flex justify-between">
-    <a href="/form">Capture</a>
-    <a href="/list">Saved</a>
-  </nav>
-  
-  <div class="flex-1 min-h-0 overflow-auto">
-    {@render children()}
-  </div>
+<div class="h-screen flex flex-col">
+  {@render children()}
 </div>
 
-<SvelteToast options={{ duration: 500, reversed: true, intro: { y: 20 } }} />
+<SvelteToast options={{ duration: 800, reversed: true, intro: { y: 20 } }} />
 
 <div class="fixed bottom-4 right-4">
-  v1.2.2
+  v{__APP_VERSION__}
 </div>
 
