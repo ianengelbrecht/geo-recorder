@@ -67,21 +67,32 @@
 
   onMount(() => {
     if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(position => {
-        coordsString = formatCoordsString(position.coords.latitude, position.coords.longitude, position.coords.accuracy)
-        if (coordsPresenter) {
-          coordsPresenter.innerHTML = coordsString
+      navigator.geolocation.watchPosition(
+        position => {
+          coordsString = formatCoordsString(
+            position.coords.latitude,
+            position.coords.longitude,
+            position.coords.accuracy
+          );
+
+          if (coordsPresenter) {
+            coordsPresenter.innerHTML = coordsString;
+          }
+        },
+        error => {
+          if (coordsPresenter) {
+            coordsPresenter.textContent =
+              `Location error (${error.code}): ${error.message}`;
+          }
+
+          console.error('Geolocation error:', error.code, error.message);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 60000,
+          maximumAge: 0
         }
-      }, error => {
-        if (coordsPresenter) {
-          coordsPresenter.innerHTML = 'Error getting location'
-        }
-        console.error(error)  
-      })
-    } else {
-      if (coordsPresenter) {
-        coordsPresenter.innerHTML = 'Geolocation is not supported'
-      }
+      );
     }
 
     const savedTheme = localStorage.getItem('theme')
@@ -106,7 +117,7 @@
 
 </script>
 
-<main id="captureScreen" class="h-full flex flex-col p-4 border">
+<main id="captureScreen" class="h-full flex flex-col p-4">
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-xl ">Current Coordinates</h1>
     <div id="controls" class="flex items-center gap-4">
