@@ -11,7 +11,13 @@
   let data: record[] = []
 
   // fetch the settings from localStorage
-  let geoSettings: settings = JSON.parse(localStorage.getItem('geoSettings') || '{}')
+  const defaultSettings = {
+    format: 'DD',
+    removeSpaces: false,
+    includeDatum: true,
+    includeGrid: true
+  }
+  let geoSettings: settings = JSON.parse(localStorage.getItem('geoSettings') || JSON.stringify(defaultSettings))
 
   let theme = $state<'dark' | 'light'>('dark')
 

@@ -6,7 +6,14 @@
   const gridOptions =['QDS']
 
   // fetch the settings from localStorage
-  let geoSettings: settings = JSON.parse(localStorage.getItem('geoSettings') || '{}')
+  // fetch the settings from localStorage
+  const defaultSettings = {
+    format: 'DD',
+    removeSpaces: false,
+    includeDatum: true,
+    includeGrid: true
+  }
+  let geoSettings: settings = JSON.parse(localStorage.getItem('geoSettings') || JSON.stringify(defaultSettings))
   
   const saveSettings = () => {
     localStorage.setItem('geoSettings', JSON.stringify(geoSettings))
