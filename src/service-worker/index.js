@@ -36,7 +36,30 @@ self.addEventListener('install', (event) => {
       const cache = await caches.open(CACHE_NAME);
 
       try {
-        await cache.addAll(APP_FILES);
+
+        const results = await Promise.allSettled(
+          APP_FILES.map(async (file) => {
+            const response = await fetch(file);
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}: ${file}`);
+            }
+
+            await cache.put(file, response);
+          })
+        );
+
+        const failures = results.filter(
+          (result) => result.status === 'rejected'
+        );
+
+        if (failures.length > 0) {
+          console.error('Failed to cache these files:', failures);
+          throw new Error(
+            `Offline caching failed for ${failures.length} files`
+          );
+        }
+
         console.log('GeoRecorder cached for offline use');
       } catch (error) {
         console.error('Failed to cache GeoRecorder:', error);
