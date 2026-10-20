@@ -162,25 +162,15 @@
 </script>
 
 {#if updateAvailable}
-  <div
-    class="flex items-center justify-between gap-3
-           rounded-lg border border-gray-300
-           bg-white p-3 shadow-md"
-    role="status"
+  <button
+    type="button"
+    onclick={applyUpdate}
+    disabled={updating}
+    class="shrink-0 rounded-md bg-blue-600
+            px-3 py-2 text-sm font-medium text-white
+            hover:bg-blue-700 disabled:opacity-50"
   >
-    <span class="text-sm text-gray-800">
-      A new version is available.
-    </span>
-
-    <button
-      type="button"
-      onclick={applyUpdate}
-      disabled={updating}
-      class="shrink-0 rounded-md bg-blue-600
-             px-3 py-2 text-sm font-medium text-white
-             hover:bg-blue-700 disabled:opacity-50"
-    >
-      {updating ? 'Updating...' : 'Update'}
-    </button>
-  </div>
+    {updating ? 'Updating...' : 'Update'}
+  </button>
+ 
 {/if}
