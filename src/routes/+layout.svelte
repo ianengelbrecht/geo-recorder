@@ -2,6 +2,7 @@
 import { asset  } from '$app/paths';
   import '../app.css';
   import { SvelteToast } from '@zerodevx/svelte-toast'
+  import PwaUpdate from '#lib/components/PwaUpdate.svelte';
 	
 	let { children } = $props();
 
@@ -24,6 +25,7 @@ import { asset  } from '$app/paths';
 </script>
 
 <div class="h-screen flex flex-col">
+  <PwaUpdate />
   {@render children()}
 </div>
 
