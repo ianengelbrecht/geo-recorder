@@ -7,30 +7,49 @@ import { asset, resolve } from '$app/paths';
 const CACHE_PREFIX = 'geo-recorder-';
 const CACHE_NAME = `${CACHE_PREFIX}${version}`;
 
-// All generated JS/CSS and files in static/
-const FILES = [
-  ...immutable.map(
-    (file) => new URL(file.path, self.registration.scope).pathname
-  ),
-  ...assets.map((file) => asset(file.path))
-];
+// SvelteKit's generated JS/CSS files.
+const BUILD_FILES = immutable.map(
+  (file) => new URL(file.path, self.registration.scope).pathname
+);
 
-// Homepage for offline navigation fallback
+// Files from the static directory.
+const STATIC_FILES = assets.map(
+  (file) => asset(file.path)
+);
+
+// The HTML entry point, including the GitHub Pages base path.
 const HOME = resolve('/');
 
-// Install the new version, but don't activate it yet.
+const APP_FILES = [
+  ...new Set([
+    ...BUILD_FILES,
+    ...STATIC_FILES,
+    HOME
+  ])
+];
+
+// INSTALL
+// Download the complete application before installation succeeds.
 self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
 
-      await cache.addAll([...new Set([...FILES, HOME])]);
+      try {
+        await cache.addAll(APP_FILES);
+        console.log('GeoRecorder cached for offline use');
+      } catch (error) {
+        console.error('Failed to cache GeoRecorder:', error);
+        throw error;
+      }
     })()
   );
+
+  // Deliberately don't call skipWaiting().
+  // The user controls updates through PwaUpdate.svelte.
 });
 
-// Activate only after the old version releases control
-// or the user explicitly requests an update.
+// ACTIVATE
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
@@ -51,27 +70,26 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Activate when the user presses Update.
+// USER-INITIATED UPDATE
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SKIP_WAITING') {
     void self.skipWaiting();
   }
 });
 
+// FETCH
 self.addEventListener('fetch', (event) => {
   const request = event.request;
 
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
+  const scope = self.registration.scope;
 
-  // Never intercept requests to other origins.
   if (url.origin !== self.location.origin) return;
+  if (!url.href.startsWith(scope)) return;
 
-  // Only handle requests within this PWA's scope.
-  if (!url.href.startsWith(self.registration.scope)) return;
-
-  // Navigation: network first, cache if offline.
+  // Navigation: try network, then cached HTML.
   if (request.mode === 'navigate') {
     event.respondWith(
       (async () => {
@@ -80,18 +98,23 @@ self.addEventListener('fetch', (event) => {
         try {
           const response = await fetch(request);
 
-          if (response.ok) {
-            await cache.put(request, response.clone());
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
           }
+
+          // Keep a copy for future offline navigation.
+          event.waitUntil(
+            cache.put(request, response.clone())
+          );
 
           return response;
         } catch {
+          // First try the exact requested page.
           const cached = await cache.match(request);
-
           if (cached) return cached;
 
+          // Fall back to our precached application entry point.
           const homepage = await cache.match(HOME);
-
           if (homepage) return homepage;
 
           return Response.error();
@@ -102,15 +125,27 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Versioned build files and static resources.
-  if (FILES.includes(url.pathname)) {
+  // Application resources: cache first.
+  if (
+    BUILD_FILES.includes(url.pathname) ||
+    STATIC_FILES.includes(url.pathname)
+  ) {
     event.respondWith(
       (async () => {
         const cache = await caches.open(CACHE_NAME);
-
         const cached = await cache.match(request);
 
-        return cached ?? fetch(request);
+        if (cached) return cached;
+
+        const response = await fetch(request);
+
+        if (response.ok) {
+          event.waitUntil(
+            cache.put(request, response.clone())
+          );
+        }
+
+        return response;
       })()
     );
   }
