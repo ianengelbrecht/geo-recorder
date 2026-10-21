@@ -1,9 +1,9 @@
 <script lang="ts">
-import { asset  } from '$app/paths';
+  import { asset  } from '$app/paths';
   import '../app.css';
   import { SvelteToast } from '@zerodevx/svelte-toast'
   import PwaUpdate from '#lib/components/PwaUpdate.svelte';
-	
+
 	let { children } = $props();
 
 </script>
