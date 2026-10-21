@@ -13,6 +13,7 @@ const BUILD_FILES = immutable.map(
 );
 
 // Files from the static directory.
+// we need to exlude jekyll files because these won't cache...
 const STATIC_FILES = assets
   .filter((file) => file.path !== '.nojekyll')
   .map((file) => asset(file.path));
