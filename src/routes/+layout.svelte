@@ -9,7 +9,7 @@ import { asset  } from '$app/paths';
 </script>
 
 <div class="relative h-screen flex flex-col">
-  <div class="absolute top-4 right-24">
+  <div class="absolute top-4 right-4">
     <PwaUpdate />
   </div>
   {@render children()}
