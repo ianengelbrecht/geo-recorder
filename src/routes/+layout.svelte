@@ -8,7 +8,7 @@
 </script>
 
 <div class="relative h-screen flex flex-col">
-  <div class="absolute top-4 right-4">
+  <div class="absolute top-4 right-4 z-100">
     <PwaUpdate />
   </div>
   {@render children()}
@@ -24,9 +24,14 @@
       target="_blank"
     >
       <img
+        src={asset("github-light.png")}
+        alt="View on GitHub"
+        class="h-8 w-8 dark:hidden"
+      />
+      <img
         src={asset("github-dark.png")}
         alt="View on GitHub"
-        class="h-8 w-8"
+        class="hidden h-8 w-8 dark:block"
       />
     </a>
   </div>

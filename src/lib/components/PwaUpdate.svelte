@@ -138,7 +138,7 @@
     type="button"
     onclick={applyUpdate}
     disabled={updating}
-    class="p-2 shrink-0 rounded-md bg-blue-600 text-white z-100"
+    class="p-2 shrink-0 rounded-md bg-blue-600 text-white"
   >
     {updating ? "Updating..." : "Update"}
   </button>
