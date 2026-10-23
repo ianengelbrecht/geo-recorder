@@ -1,54 +1,74 @@
 <script lang="ts">
-  import type { settings } from '../../types'
-  import {goto} from '$app/navigation'
-  import { resolve } from '$app/paths';
+  import type { settings } from "../../types";
+  import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
+  import { InfoIcon } from "#lib/icons/index.ts";
 
-  const formatOptions = [ 'DD', 'DM', 'DMS' ]
-  const gridOptions =['QDS']
+  const formatOptions = ["DD", "DM", "DMS"];
+  const gridOptions = ["QDS"];
 
   // fetch the settings from localStorage
   const defaultSettings: settings = {
-    format: 'DD',
+    format: "DD",
     ddAsString: false,
     removeSpaces: false,
     includeDatum: true,
-    includeGrid: ""
-  }
-  let geoSettings: settings = JSON.parse(localStorage.getItem('geoSettings') || JSON.stringify(defaultSettings))
-  
+    includeGrid: "",
+  };
+  let geoSettings: settings = JSON.parse(
+    localStorage.getItem("geoSettings") || JSON.stringify(defaultSettings),
+  );
+
   const saveSettings = () => {
-    localStorage.setItem('geoSettings', JSON.stringify(geoSettings))
-    goto(resolve('/'))
-  }
+    localStorage.setItem("geoSettings", JSON.stringify(geoSettings));
+    goto(resolve("/"));
+  };
 
-  let edits = false
-
+  let edits = false;
 </script>
 
-<main class="flex-1 p-4">
+<main class="flex-1 p-4 h-full">
   <h1 class="text-xl mb-4">Settings</h1>
   <form class="flex flex-col gap-4">
     <label class="flex items-center gap-2">
       Format:
-      <select bind:value={geoSettings.format} class="bg-slate-100 text-slate-900 border border-slate-300 dark:bg-slate-700 dark:text-white dark:border-transparent rounded p-2" onchange={() => edits = true}>
+      <select
+        bind:value={geoSettings.format}
+        class="bg-slate-100 text-slate-900 border border-slate-300 dark:bg-slate-700 dark:text-white dark:border-transparent rounded p-2"
+        onchange={() => (edits = true)}
+      >
         {#each formatOptions as option}
           <option value={option}>{option}</option>
         {/each}
       </select>
     </label>
-    {#if geoSettings.format === 'DD'}
+    {#if geoSettings.format === "DD"}
       <label class="flex items-center gap-2">
         DD with symbols:
-        <input type="checkbox" bind:checked={geoSettings.ddAsString} class="h-6 w-6 rounded" onchange={() => edits = true} />
+        <input
+          type="checkbox"
+          bind:checked={geoSettings.ddAsString}
+          class="h-6 w-6 rounded"
+          onchange={() => (edits = true)}
+        />
       </label>
     {/if}
     <label class="flex items-center gap-2">
       Remove Spaces:
-      <input type="checkbox" bind:checked={geoSettings.removeSpaces} class="h-6 w-6 rounded" onchange={() => edits = true} />
+      <input
+        type="checkbox"
+        bind:checked={geoSettings.removeSpaces}
+        class="h-6 w-6 rounded"
+        onchange={() => (edits = true)}
+      />
     </label>
     <label class="flex items-center gap-2">
       Include Grid (currently QDGS only):
-      <select bind:value={geoSettings.includeGrid} class="bg-slate-100 text-slate-900 border border-slate-300 dark:bg-slate-700 dark:text-white dark:border-transparent rounded p-2" onchange={() => edits = true}>
+      <select
+        bind:value={geoSettings.includeGrid}
+        class="bg-slate-100 text-slate-900 border border-slate-300 dark:bg-slate-700 dark:text-white dark:border-transparent rounded p-2"
+        onchange={() => (edits = true)}
+      >
         <option value="">None</option>
         {#each gridOptions as option}
           <option value={option}>{option}</option>
@@ -57,9 +77,19 @@
     </label>
     <label class="flex items-center gap-2">
       Include Datum:
-      <input type="checkbox" bind:checked={geoSettings.includeDatum} class="h-6 w-6 rounded" onchange={() => edits = true} />
+      <input
+        type="checkbox"
+        bind:checked={geoSettings.includeDatum}
+        class="h-6 w-6 rounded"
+        onchange={() => (edits = true)}
+      />
     </label>
-    <button type="button" onclick={saveSettings} class="w-32 mt-4 p-2 bg-blue-600 rounded active:bg-blue-400 text-white">{edits ? 'Save Settings' : 'Back'}</button>
+    <button
+      type="button"
+      onclick={saveSettings}
+      class="w-32 mt-4 p-2 bg-blue-600 rounded active:bg-blue-400 text-white"
+    >
+      {edits ? "Save Settings" : "Back"}
+    </button>
   </form>
 </main>
-

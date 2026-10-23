@@ -16,6 +16,7 @@
 
   let locationError = $state<"denied" | "unavailable" | "timeout" | null>(null);
   let showLocationHelp = $state(false);
+  let showInfo: boolean = $state(false);
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isAndroid = /Android/i.test(navigator.userAgent);
@@ -136,7 +137,7 @@
 
 <main
   id="captureScreen"
-  class="relative h-full flex flex-col p-4 border-2 border-amber-400/30"
+  class="relative h-full flex flex-col p-4"
 >
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-xl">Current Coordinates</h1>
@@ -252,5 +253,24 @@
         </div>
       </div>
     </div>
+  {:else if showInfo}
+    <div
+      class="absolute bottom-12 m-3 mr-6 p-3 border-2 rounded dark:border-white flex items-center"
+    >
+      <p>
+        Capture geographic coordinates with supporting metadata for use in other
+        apps. Simple!
+      </p>
+      <button onclick={() => (showInfo = false)}>
+        <InfoIcon />
+      </button>
+    </div>
+  {:else}
+    <button
+      class="absolute bottom-4 left-4"
+      onclick={() => (showInfo = true)}
+    >
+      <InfoIcon />
+    </button>
   {/if}
 </main>

@@ -1,6 +1,5 @@
-
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount } from "svelte";
 
   let updateAvailable = $state(false);
   let updating = $state(false);
@@ -8,7 +7,7 @@
   let registration: ServiceWorkerRegistration | undefined;
 
   onMount(() => {
-    if (!('serviceWorker' in navigator)) return;
+    if (!("serviceWorker" in navigator)) return;
 
     let disposed = false;
     let reloading = false;
@@ -21,29 +20,22 @@
       // Only offer updates when an existing worker
       // is already controlling the application.
       updateAvailable = Boolean(
-        registration.waiting &&
-        navigator.serviceWorker.controller
+        registration.waiting && navigator.serviceWorker.controller,
       );
     }
 
     function onStateChange() {
-      if (installingWorker?.state === 'installed') {
+      if (installingWorker?.state === "installed") {
         checkWaiting();
       }
     }
 
     function onUpdateFound() {
-      installingWorker?.removeEventListener(
-        'statechange',
-        onStateChange
-      );
+      installingWorker?.removeEventListener("statechange", onStateChange);
 
       installingWorker = registration?.installing ?? null;
 
-      installingWorker?.addEventListener(
-        'statechange',
-        onStateChange
-      );
+      installingWorker?.addEventListener("statechange", onStateChange);
     }
 
     function onControllerChange() {
@@ -55,22 +47,18 @@
     }
 
     async function checkForUpdates() {
-      if (
-        disposed ||
-        !registration ||
-        !navigator.onLine
-      ) return;
+      if (disposed || !registration || !navigator.onLine) return;
 
       try {
         await registration.update();
         checkWaiting();
       } catch (error) {
-        console.warn('PWA update check failed:', error);
+        console.warn("PWA update check failed:", error);
       }
     }
 
     function onVisibilityChange() {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === "visible") {
         void checkForUpdates();
       }
     }
@@ -87,22 +75,16 @@
 
         if (disposed) return;
 
-        registration.addEventListener(
-          'updatefound',
-          onUpdateFound
-        );
+        registration.addEventListener("updatefound", onUpdateFound);
 
         navigator.serviceWorker.addEventListener(
-          'controllerchange',
-          onControllerChange
+          "controllerchange",
+          onControllerChange,
         );
 
-        document.addEventListener(
-          'visibilitychange',
-          onVisibilityChange
-        );
+        document.addEventListener("visibilitychange", onVisibilityChange);
 
-        window.addEventListener('online', onOnline);
+        window.addEventListener("online", onOnline);
 
         // Handle an update already waiting.
         checkWaiting();
@@ -114,9 +96,8 @@
 
         // Check immediately.
         await checkForUpdates();
-
       } catch (error) {
-        console.warn('PWA update monitoring failed:', error);
+        console.warn("PWA update monitoring failed:", error);
       }
     }
 
@@ -125,27 +106,18 @@
     return () => {
       disposed = true;
 
-      registration?.removeEventListener(
-        'updatefound',
-        onUpdateFound
-      );
+      registration?.removeEventListener("updatefound", onUpdateFound);
 
-      installingWorker?.removeEventListener(
-        'statechange',
-        onStateChange
-      );
+      installingWorker?.removeEventListener("statechange", onStateChange);
 
       navigator.serviceWorker.removeEventListener(
-        'controllerchange',
-        onControllerChange
+        "controllerchange",
+        onControllerChange,
       );
 
-      document.removeEventListener(
-        'visibilitychange',
-        onVisibilityChange
-      );
+      document.removeEventListener("visibilitychange", onVisibilityChange);
 
-      window.removeEventListener('online', onOnline);
+      window.removeEventListener("online", onOnline);
     };
   });
 
@@ -156,7 +128,7 @@
 
     // Tell the new worker to activate.
     registration.waiting.postMessage({
-      type: 'SKIP_WAITING'
+      type: "SKIP_WAITING",
     });
   }
 </script>
@@ -166,9 +138,8 @@
     type="button"
     onclick={applyUpdate}
     disabled={updating}
-    class="p-2 shrink-0 rounded-md bg-blue-600 text-white"
+    class="p-2 shrink-0 rounded-md bg-blue-600 text-white z-100"
   >
-    {updating ? 'Updating...' : 'Update'}
+    {updating ? "Updating..." : "Update"}
   </button>
- 
 {/if}
