@@ -3,8 +3,7 @@
   import { resolve } from '$app/paths';
   import { toast } from '@zerodevx/svelte-toast'
   import type { record, settings }   from '../types'
-  import { convert } from 'geo-coordinates-parser'
-  import { coordsToQDS } from '../utils/coordsToQDS'
+  import { formatCoordsString } from '../lib/utils/formatCoordsString'
 
   let coordsPresenter: HTMLParagraphElement | null
   let coordsString: string | null
@@ -12,11 +11,12 @@
   let data: record[] = []
 
   // fetch the settings from localStorage
-  const defaultSettings = {
+  const defaultSettings: settings = {
     format: 'DD',
+    ddAsString: false,
     removeSpaces: false,
     includeDatum: true,
-    includeGrid: true
+    includeGrid: ""
   }
   let geoSettings: settings = JSON.parse(localStorage.getItem('geoSettings') || JSON.stringify(defaultSettings))
 
@@ -36,35 +36,6 @@
     }
   }
 
-  const formatCoordsString = (latitude: number, longitude: number, accuracy: number) => {
-    let coordsString = ''
-    if (geoSettings.format === 'DD') {
-      coordsString = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`
-    }
-    else if (geoSettings.format === 'DM') {
-      coordsString = convert(`${latitude}, ${longitude}`).toCoordinateFormat(convert.to.DM)
-    }
-    else if (geoSettings.format === 'DMS') {
-      coordsString = convert(`${latitude}, ${longitude}`).toCoordinateFormat(convert.to.DMS)
-    }
-
-    if (geoSettings.removeSpaces) {
-      coordsString = coordsString.replace(/\s+/g, '')
-    }
-
-    coordsString += ` ± ${Math.round(accuracy)}m`
-
-    if (geoSettings.includeDatum) {
-      coordsString += ' WGS84'
-    }
-
-    if (geoSettings.includeGrid) {
-      coordsString += ` ${coordsToQDS(`${latitude}, ${longitude}`)}`
-    }
-
-    return coordsString
-  }
-
   onMount(() => {
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition(
@@ -72,7 +43,8 @@
           coordsString = formatCoordsString(
             position.coords.latitude,
             position.coords.longitude,
-            position.coords.accuracy
+            position.coords.accuracy,
+            geoSettings
           );
 
           if (coordsPresenter) {

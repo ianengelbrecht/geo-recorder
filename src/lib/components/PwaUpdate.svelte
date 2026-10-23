@@ -166,9 +166,7 @@
     type="button"
     onclick={applyUpdate}
     disabled={updating}
-    class="shrink-0 rounded-md border  border-blue-300 dark:border-blue-700
-            px-3 py-2 text-sm font-medium text-slate-700 dark:text-white
-            hover:bg-blue-700 disabled:opacity-50"
+    class="p-2 shrink-0 rounded-md bg-blue-600 text-white"
   >
     {updating ? 'Updating...' : 'Update'}
   </button>

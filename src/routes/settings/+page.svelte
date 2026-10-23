@@ -7,12 +7,12 @@
   const gridOptions =['QDS']
 
   // fetch the settings from localStorage
-  // fetch the settings from localStorage
-  const defaultSettings = {
+  const defaultSettings: settings = {
     format: 'DD',
+    ddAsString: false,
     removeSpaces: false,
     includeDatum: true,
-    includeGrid: true
+    includeGrid: ""
   }
   let geoSettings: settings = JSON.parse(localStorage.getItem('geoSettings') || JSON.stringify(defaultSettings))
   
@@ -36,6 +36,12 @@
         {/each}
       </select>
     </label>
+    {#if geoSettings.format === 'DD'}
+      <label class="flex items-center gap-2">
+        DD with symbols:
+        <input type="checkbox" bind:checked={geoSettings.ddAsString} class="h-6 w-6 rounded" onchange={() => edits = true} />
+      </label>
+    {/if}
     <label class="flex items-center gap-2">
       Remove Spaces:
       <input type="checkbox" bind:checked={geoSettings.removeSpaces} class="h-6 w-6 rounded" onchange={() => edits = true} />
