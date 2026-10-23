@@ -1,8 +1,13 @@
 <script lang="ts">
+  import { setContext } from "svelte";
   import { asset } from "$app/paths";
   import "../app.css";
   import { SvelteToast } from "@zerodevx/svelte-toast";
   import PwaUpdate from "#lib/components/PwaUpdate.svelte";
+  import { InfoIcon } from "#lib/icons/index.ts";
+
+  let ui = $state({ showInfo: false });
+  setContext("ui", ui);
 
   let { children } = $props();
 </script>
@@ -16,7 +21,26 @@
 
 <SvelteToast options={{ duration: 800, reversed: true, intro: { y: 20 } }} />
 
-<div class="fixed bottom-4 right-4">
+<div class="fixed w-screen bottom-8 px-4 flex justify-between items-center">
+  {#if ui.showInfo}
+    <div
+      class="absolute bottom-12 m-3 mr-6 p-3 border-2 rounded dark:border-white flex items-center"
+    >
+      <p>
+        Capture geographic coordinates with supporting metadata for use in other
+        apps. Simple!
+      </p>
+      <button onclick={() => (ui.showInfo = false)}>
+        <InfoIcon />
+      </button>
+    </div>
+  {/if}
+  <button
+    class="bottom-4 left-4"
+    onclick={() => (ui.showInfo = !ui.showInfo)}
+  >
+    <InfoIcon />
+  </button>
   <div class="flex gap-4 items-center">
     v{__APP_VERSION__}
     <a

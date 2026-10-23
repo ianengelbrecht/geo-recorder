@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, getContext } from "svelte";
   import { resolve } from "$app/paths";
   import { toast } from "@zerodevx/svelte-toast";
   import {
@@ -14,9 +14,10 @@
   import type { settings } from "../types";
   import { formatCoordsString } from "../lib/utils/formatCoordsString";
 
+  const ui = getContext<{ showInfo: boolean }>("ui");
+
   let locationError = $state<"denied" | "unavailable" | "timeout" | null>(null);
   let showLocationHelp = $state(false);
-  let showInfo: boolean = $state(false);
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isAndroid = /Android/i.test(navigator.userAgent);
@@ -240,7 +241,7 @@
       </button>
     {/if}
   </div>
-  {#if isAndroid && accuracy && accuracy > accuracyThreshold}
+  {#if isAndroid && accuracy && accuracy > accuracyThreshold && !ui.showInfo}
     <div class="mb-8 my-3 rounded-lg border-2 border-amber-400 p-3">
       <div class="flex items-center gap-2">
         <span>
@@ -253,24 +254,5 @@
         </div>
       </div>
     </div>
-  {:else if showInfo}
-    <div
-      class="absolute bottom-12 m-3 mr-6 p-3 border-2 rounded dark:border-white flex items-center"
-    >
-      <p>
-        Capture geographic coordinates with supporting metadata for use in other
-        apps. Simple!
-      </p>
-      <button onclick={() => (showInfo = false)}>
-        <InfoIcon />
-      </button>
-    </div>
-  {:else}
-    <button
-      class="absolute bottom-4 left-4"
-      onclick={() => (showInfo = true)}
-    >
-      <InfoIcon />
-    </button>
   {/if}
 </main>
