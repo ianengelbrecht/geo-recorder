@@ -41,12 +41,13 @@
   >
     <InfoIcon />
   </button>
-  <div class="flex gap-4 items-center">
+  <a
+    class="flex gap-4 items-center"
+    href="https://github.com/ianengelbrecht/geo-recorder"
+    target="_blank"
+  >
     v{__APP_VERSION__}
-    <a
-      href="https://github.com/ianengelbrecht/geo-recorder"
-      target="_blank"
-    >
+    <div>
       <img
         src={asset("github-light.png")}
         alt="View on GitHub"
@@ -57,6 +58,6 @@
         alt="View on GitHub"
         class="hidden h-8 w-8 dark:block"
       />
-    </a>
-  </div>
+    </div>
+  </a>
 </div>
