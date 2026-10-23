@@ -8,6 +8,7 @@
     SunIcon,
     MoonIcon,
     SettingsIcon,
+    WarningIcon,
   } from "#lib/icons/index.ts";
 
   import type { settings } from "../types";
@@ -21,6 +22,8 @@
 
   let coordsPresenter: HTMLParagraphElement | null = $state(null);
   let coordsString: string | null;
+  let accuracy: number | null = $state(null);
+  const accuracyThreshold = 250;
 
   // fetch the settings from localStorage
   const defaultSettings: settings = {
@@ -70,9 +73,11 @@
 
           if (coordsPresenter) {
             coordsPresenter.innerHTML = coordsString;
+            accuracy = position.coords.accuracy;
           }
         },
         (error) => {
+          accuracy = null;
           switch (error.code) {
             case 1:
               locationError = "denied";
@@ -86,6 +91,7 @@
           }
 
           if (coordsPresenter) {
+            accuracy = null;
             coordsPresenter.textContent = "Location unavailable";
           }
 
@@ -98,6 +104,7 @@
         },
       );
     } else {
+      accuracy = null;
       locationError = "unavailable";
     }
 
@@ -129,7 +136,7 @@
 
 <main
   id="captureScreen"
-  class="h-full flex flex-col p-4"
+  class="relative h-full flex flex-col p-4 border-2 border-amber-400/30"
 >
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-xl">Current Coordinates</h1>
@@ -164,7 +171,7 @@
   </div>
   <div class="flex-1 min-h-0 flex flex-col justify-center items-center">
     {#if locationError}
-      <div class="my-3 rounded-lg border border-amber-500/30 p-3">
+      <div class="my-3 rounded-lg border-2 border-amber-400 p-3">
         <div class="flex items-center justify-between gap-2">
           <span>
             {locationError === "denied"
@@ -232,4 +239,18 @@
       </button>
     {/if}
   </div>
+  {#if isAndroid && accuracy && accuracy > accuracyThreshold}
+    <div class="mb-8 my-3 rounded-lg border-2 border-amber-400 p-3">
+      <div class="flex items-center gap-2">
+        <span>
+          Your device is reporting an accuracy worse than {accuracyThreshold} metres.
+          Check that Precise Location is enabled for this app in Android settings,
+          as well as location settings for your browser.
+        </span>
+        <div class="h-6 w-6 text-amber-400">
+          <WarningIcon />
+        </div>
+      </div>
+    </div>
+  {/if}
 </main>
