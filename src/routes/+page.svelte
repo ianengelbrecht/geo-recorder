@@ -60,12 +60,6 @@
   };
 
   onMount(() => {
-    alert(
-      `Screen: ${screen.width} × ${screen.height}\n` +
-        `Pixel ratio: ${window.devicePixelRatio}\n` +
-        `Orientation: ${screen.orientation?.type}`,
-    );
-
     let watchId: number | undefined;
 
     if (navigator.geolocation) {
