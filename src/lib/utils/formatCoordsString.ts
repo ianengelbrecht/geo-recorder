@@ -3,7 +3,7 @@ import type { settings } from '../../types'
 import { coordsToQDS } from './coordsToQDS'
 
 
-export const formatCoordsString = (latitude: number, longitude: number, accuracy: number, settings: settings) => {
+export const formatCoordsString = (latitude: number, longitude: number, accuracy: number, settings: settings, coordsOnly: boolean) => {
   let coordsString = ''
   if (settings.format === 'DD') {
     coordsString = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`
@@ -36,14 +36,15 @@ export const formatCoordsString = (latitude: number, longitude: number, accuracy
     coordsString = coordsString.replace(/\s+/g, '')
   }
 
-  coordsString += ` ± ${Math.round(accuracy)}m`
+  if (!coordsOnly) {
+    coordsString += ` ± ${Math.round(accuracy)}m`
+    if (settings.includeDatum) {
+      coordsString += ' WGS84'
+    }
 
-  if (settings.includeDatum) {
-    coordsString += ' WGS84'
-  }
-
-  if (settings.includeGrid) {
-    coordsString += ` ${coordsToQDS(`${latitude}, ${longitude}`)}`
+    if (settings.includeGrid) {
+      coordsString += ` ${coordsToQDS(`${latitude}, ${longitude}`)}`
+    }
   }
 
   return coordsString

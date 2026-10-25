@@ -25,7 +25,8 @@
   const isAndroid = /Android/i.test(navigator.userAgent);
 
   let coordsPresenter: HTMLParagraphElement | null = $state(null);
-  let coordsString: string | null;
+  let coordsString: string | null = $state(null);
+  let coordsOnlyString: string | null = $state(null);
   let accuracy: number | null = $state(null);
   const accuracyThreshold = 250;
 
@@ -80,6 +81,14 @@
             position.coords.longitude,
             position.coords.accuracy,
             geoSettings,
+            false,
+          );
+          coordsOnlyString = formatCoordsString(
+            position.coords.latitude,
+            position.coords.longitude,
+            position.coords.accuracy,
+            geoSettings,
+            true,
           );
 
           if (coordsPresenter) {
@@ -144,6 +153,15 @@
 
     navigator.clipboard
       .writeText(coordsString)
+      .then(() => toast.push("Coordinates copied!"))
+      .catch((err) => alert("Failed to copy coordinates: " + err));
+  };
+
+  const copyCoordsOnly = () => {
+    if (!coordsOnlyString) return alert("No position available");
+
+    navigator.clipboard
+      .writeText(coordsOnlyString)
       .then(() => toast.push("Coordinates copied!"))
       .catch((err) => alert("Failed to copy coordinates: " + err));
   };
@@ -245,12 +263,22 @@
       >
         Waiting for location...
       </p>
+
       <button
         onclick={copyCoords}
-        class="w-fit mt-4 p-2 bg-blue-600 rounded active:bg-blue-400 text-white"
+        class="w-56 mt-4 p-2 bg-blue-600 rounded active:bg-blue-400 text-white disabled:opacity-50"
+        hidden={!coordsString}
       >
         <CopyIcon />
-        <span>Copy coordinates</span>
+        <span>Copy full string</span>
+      </button>
+      <button
+        onclick={copyCoordsOnly}
+        class="w-56 mt-4 p-2 text-slate-800 border border-slate-800 dark:border-white dark:text-white rounded active:bg-blue-400 disabled:opacity-50"
+        hidden={!coordsOnlyString}
+      >
+        <CopyIcon />
+        <span>Copy coords only</span>
       </button>
     {/if}
     {#if locationErrorMessage}
