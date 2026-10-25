@@ -18,6 +18,7 @@
 
   let locationError = $state<"denied" | "unavailable" | "timeout" | null>(null);
   let showLocationHelp = $state(false);
+  let locationErrorMessage = $state<string | null>(null);
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isAndroid = /Android/i.test(navigator.userAgent);
@@ -65,6 +66,7 @@
       watchId = navigator.geolocation.watchPosition(
         (position) => {
           locationError = null;
+          locationErrorMessage = null;
 
           coordsString = formatCoordsString(
             position.coords.latitude,
@@ -80,6 +82,7 @@
         },
         (error) => {
           accuracy = null;
+          locationErrorMessage = `Code ${error.code}: ${error.message}`;
           switch (error.code) {
             case 1:
               locationError = "denied";
@@ -239,6 +242,16 @@
         <CopyIcon />
         <span>Copy coordinates</span>
       </button>
+    {/if}
+    {#if locationErrorMessage}
+      <div class="mt-2 flex items-center">
+        <p class="opacity-70">
+          {locationErrorMessage}
+        </p>
+        <div class="h-6 w-6 text-red-400">
+          <WarningIcon />
+        </div>
+      </div>
     {/if}
   </div>
   {#if isAndroid && accuracy && accuracy > accuracyThreshold && !ui.showInfo}
