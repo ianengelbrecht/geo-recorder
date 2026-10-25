@@ -90,34 +90,32 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
   if (!url.href.startsWith(scope)) return;
 
-  // Navigation: try network, then cached HTML.
+  // Navigation: cache first, network fallback.
   if (request.mode === 'navigate') {
     event.respondWith(
       (async () => {
         const cache = await caches.open(CACHE_NAME);
 
+        // First try the exact requested page.
+        const cached = await cache.match(request);
+        if (cached) return cached;
+
+        // Fall back to the precached application entry point.
+        const homepage = await cache.match(HOME);
+        if (homepage) return homepage;
+
+        // Only use the network if nothing is cached.
         try {
           const response = await fetch(request);
 
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+          if (response.ok) {
+            event.waitUntil(
+              cache.put(request, response.clone())
+            );
           }
-
-          // Keep a copy for future offline navigation.
-          event.waitUntil(
-            cache.put(request, response.clone())
-          );
 
           return response;
         } catch {
-          // First try the exact requested page.
-          const cached = await cache.match(request);
-          if (cached) return cached;
-
-          // Fall back to our precached application entry point.
-          const homepage = await cache.match(HOME);
-          if (homepage) return homepage;
-
           return Response.error();
         }
       })()
