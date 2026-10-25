@@ -19,6 +19,7 @@
   let locationError = $state<"denied" | "unavailable" | "timeout" | null>(null);
   let showLocationHelp = $state(false);
   let locationErrorMessage = $state<string | null>(null);
+  let locationCountdown = $state(30);
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isAndroid = /Android/i.test(navigator.userAgent);
@@ -62,6 +63,12 @@
   onMount(() => {
     let watchId: number | undefined;
 
+    const countdownInterval = setInterval(() => {
+      if (accuracy === null) {
+        locationCountdown = locationCountdown > 1 ? locationCountdown - 1 : 30;
+      }
+    }, 1000);
+
     if (navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
         (position) => {
@@ -79,6 +86,8 @@
             coordsPresenter.innerHTML = coordsString;
             accuracy = position.coords.accuracy;
           }
+
+          locationCountdown = 30;
         },
         (error) => {
           accuracy = null;
@@ -123,6 +132,7 @@
     }
 
     return () => {
+      clearInterval(countdownInterval);
       if (watchId !== undefined) {
         navigator.geolocation.clearWatch(watchId);
       }
@@ -181,7 +191,7 @@
           <span>
             {locationError === "denied"
               ? "Location access denied"
-              : "Location unavailable - please wait..."}
+              : "Location unavailable"}
           </span>
 
           <button
@@ -252,6 +262,11 @@
           <WarningIcon />
         </div>
       </div>
+    {/if}
+    {#if locationError === "unavailable" || locationError === "timeout"}
+      <p class="mt-2 text-sm opacity-70">
+        Please wait: {locationCountdown}s
+      </p>
     {/if}
   </div>
   {#if isAndroid && accuracy && accuracy > accuracyThreshold && !ui.showInfo}
