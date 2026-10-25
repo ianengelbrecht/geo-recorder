@@ -12,7 +12,7 @@
   let { children } = $props();
 </script>
 
-<div class="relative h-screen flex flex-col bg-blue-700">
+<div class="relative h-screen flex flex-col">
   <div class="absolute top-4 right-4 z-100">
     <PwaUpdate />
   </div>
