@@ -181,7 +181,7 @@
           <span>
             {locationError === "denied"
               ? "Location access denied"
-              : "Location unavailable"}
+              : "Location unavailable - please wait..."}
           </span>
 
           <button
