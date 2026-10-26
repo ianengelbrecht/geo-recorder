@@ -1,16 +1,37 @@
 <script lang="ts">
-  import { setContext } from "svelte";
+  import { onMount, setContext } from "svelte";
   import { asset } from "$app/paths";
   import "../app.css";
   import { SvelteToast } from "@zerodevx/svelte-toast";
   import PwaUpdate from "#lib/components/PwaUpdate.svelte";
   import { InfoIcon } from "#lib/icons/index.ts";
 
+  let showSplash = $state(import.meta.env.PROD); // only show the splash screen in production
   let ui = $state({ showInfo: false });
   setContext("ui", ui);
 
   let { children } = $props();
+
+  onMount(() => {
+    const timer = setTimeout(() => {
+      showSplash = false;
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  });
 </script>
+
+{#if showSplash}
+  <div
+    class="fixed inset-0 z-9999 flex items-center justify-center bg-slate-900"
+  >
+    <img
+      src={asset("favicon-dark.png")}
+      alt="Geo Recorder"
+      class="h-17.5 w-17.5 object-contain"
+    />
+  </div>
+{/if}
 
 <div class="relative h-screen flex flex-col">
   <div class="absolute top-4 right-4 z-100">
