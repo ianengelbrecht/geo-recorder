@@ -1,6 +1,7 @@
 import { convert } from 'geo-coordinates-parser'
 import type { settings } from '../../types'
 import { coordsToQDS } from './coordsToQDS'
+import { getCurrentDateTime } from './getCurrentDate'
 
 
 export const formatCoordsString = (latitude: number, longitude: number, accuracy: number, settings: settings, coordsOnly: boolean) => {
@@ -37,7 +38,13 @@ export const formatCoordsString = (latitude: number, longitude: number, accuracy
   }
 
   if (!coordsOnly) {
-    coordsString += ` ± ${Math.round(accuracy)}m`
+    if (settings.useAccuracyPlaceholder) {
+      coordsString += ` ± ____\u2060m` // Placeholder and invisible character for proper breaking
+    }
+    else {
+      coordsString += ` ± ${Math.round(accuracy)}m`
+    }
+
     if (settings.includeDatum) {
       coordsString += ' WGS84'
     }
@@ -45,6 +52,11 @@ export const formatCoordsString = (latitude: number, longitude: number, accuracy
     if (settings.includeGrid) {
       coordsString += ` ${coordsToQDS(`${latitude}, ${longitude}`)}`
     }
+  }
+
+  if (settings.includeDate && !coordsOnly) {
+    const dateNow = getCurrentDateTime(settings.useSlashesNotDashes, settings.includeTime)
+    coordsString += `\n${dateNow}`
   }
 
   return coordsString

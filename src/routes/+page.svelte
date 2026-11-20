@@ -11,8 +11,9 @@
     WarningIcon,
   } from "#lib/icons/index.ts";
 
-  import type { settings } from "../types";
+  import { defaultSettings } from "./defaultSettings.ts";
   import { formatCoordsString } from "../lib/utils/formatCoordsString";
+  import { coordsToQDS } from "../lib/utils/coordsToQDS";
 
   const ui = getContext<{ showInfo: boolean }>("ui");
 
@@ -26,19 +27,12 @@
 
   let coordsPresenter: HTMLParagraphElement | null = $state(null);
   let coordsString: string | null = $state(null);
-  let coordsOnlyString: string | null = $state(null);
+  let latitude: number | null = $state(null);
+  let longitude: number | null = $state(null);
   let accuracy: number | null = $state(null);
   const accuracyThreshold = 250;
 
-  // fetch the settings from localStorage
-  const defaultSettings: settings = {
-    format: "DD",
-    ddAsString: false,
-    removeSpaces: false,
-    includeDatum: true,
-    includeGrid: "",
-  };
-  let geoSettings: settings = JSON.parse(
+  let geoSettings = JSON.parse(
     localStorage.getItem("geoSettings") || JSON.stringify(defaultSettings),
   );
 
@@ -76,24 +70,30 @@
           locationError = null;
           locationErrorMessage = null;
 
+          latitude = position.coords.latitude;
+          longitude = position.coords.longitude;
+          accuracy = position.coords.accuracy;
+
           coordsString = formatCoordsString(
-            position.coords.latitude,
-            position.coords.longitude,
-            position.coords.accuracy,
-            geoSettings,
-            false,
-          );
-          coordsOnlyString = formatCoordsString(
-            position.coords.latitude,
-            position.coords.longitude,
-            position.coords.accuracy,
+            latitude,
+            longitude,
+            accuracy,
             geoSettings,
             true,
           );
 
           if (coordsPresenter) {
-            coordsPresenter.innerHTML = coordsString;
-            accuracy = position.coords.accuracy;
+            let coordsPresenterString = `${coordsString} ± ${Math.round(accuracy)}m`;
+
+            if (geoSettings.includeDatum) {
+              coordsPresenterString += " WGS84";
+            }
+
+            if (geoSettings.includeGrid) {
+              coordsPresenterString += ` ${coordsToQDS(`${latitude}, ${longitude}`)}`;
+            }
+
+            coordsPresenter.innerHTML = coordsPresenterString;
           }
 
           locationCountdown = 30;
@@ -151,17 +151,25 @@
   const copyCoords = () => {
     if (!coordsString) return alert("No position available");
 
+    const fullString = formatCoordsString(
+      latitude || 0,
+      longitude || 0,
+      accuracy || 0,
+      geoSettings,
+      false,
+    );
+
     navigator.clipboard
-      .writeText(coordsString)
+      .writeText(fullString)
       .then(() => toast.push("Coordinates copied!"))
       .catch((err) => alert("Failed to copy coordinates: " + err));
   };
 
   const copyCoordsOnly = () => {
-    if (!coordsOnlyString) return alert("No position available");
+    if (!coordsString) return alert("No position available");
 
     navigator.clipboard
-      .writeText(coordsOnlyString)
+      .writeText(coordsString)
       .then(() => toast.push("Coordinates copied!"))
       .catch((err) => alert("Failed to copy coordinates: " + err));
   };
@@ -266,7 +274,7 @@
 
       <button
         onclick={copyCoords}
-        class="w-56 mt-4 p-2 bg-blue-600 rounded active:bg-blue-400 text-white disabled:opacity-50"
+        class="w-56 mt-4 p-2 bg-blue-600 rounded active:bg-blue-400 text-white disabled:opacity-50 cursor-pointer select-none"
         hidden={!coordsString}
       >
         <CopyIcon />
@@ -274,8 +282,8 @@
       </button>
       <button
         onclick={copyCoordsOnly}
-        class="w-56 mt-4 p-2 text-slate-800 border border-slate-800 dark:border-white dark:text-white rounded active:bg-blue-400 disabled:opacity-50"
-        hidden={!coordsOnlyString}
+        class="w-56 mt-4 p-2 text-slate-800 border border-slate-800 dark:border-white dark:text-white rounded active:bg-blue-400 disabled:opacity-50 cursor-pointer select-none"
+        hidden={!coordsString}
       >
         <CopyIcon />
         <span>Copy coords only</span>

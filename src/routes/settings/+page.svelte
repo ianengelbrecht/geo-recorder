@@ -1,21 +1,13 @@
 <script lang="ts">
-  import type { settings } from "../../types";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { InfoIcon } from "#lib/icons/index.ts";
+  import { getCurrentDateTime } from "../../lib/utils/getCurrentDate";
+  import { defaultSettings } from "../defaultSettings.ts";
 
   const formatOptions = ["DD", "DM", "DMS"];
   const gridOptions = ["QDS"];
 
-  // fetch the settings from localStorage
-  const defaultSettings: settings = {
-    format: "DD",
-    ddAsString: false,
-    removeSpaces: false,
-    includeDatum: true,
-    includeGrid: "",
-  };
-  let geoSettings: settings = JSON.parse(
+  let geoSettings = JSON.parse(
     localStorage.getItem("geoSettings") || JSON.stringify(defaultSettings),
   );
 
@@ -63,6 +55,15 @@
       />
     </label>
     <label class="flex items-center gap-2">
+      Use Accuracy Placeholder:
+      <input
+        type="checkbox"
+        bind:checked={geoSettings.useAccuracyPlaceholder}
+        class="h-6 w-6 rounded"
+        onchange={() => (edits = true)}
+      />
+    </label>
+    <label class="flex items-center gap-2">
       Include Grid (currently QDGS only):
       <select
         bind:value={geoSettings.includeGrid}
@@ -84,6 +85,38 @@
         onchange={() => (edits = true)}
       />
     </label>
+    <label class="flex items-center gap-2">
+      Include Date:
+      <input
+        type="checkbox"
+        bind:checked={geoSettings.includeDate}
+        class="h-6 w-6 rounded"
+        onchange={() => (edits = true)}
+      />
+    </label>
+    {#if geoSettings.includeDate}
+      <label class="flex items-center gap-2">
+        Use Slashes Not Dashes ({getCurrentDateTime(
+          geoSettings.useSlashesNotDashes,
+          false,
+        )}):
+        <input
+          type="checkbox"
+          bind:checked={geoSettings.useSlashesNotDashes}
+          class="h-6 w-6 rounded"
+          onchange={() => (edits = true)}
+        />
+      </label>
+      <label class="flex items-center gap-2">
+        Include Time:
+        <input
+          type="checkbox"
+          bind:checked={geoSettings.includeTime}
+          class="h-6 w-6 rounded"
+          onchange={() => (edits = true)}
+        />
+      </label>
+    {/if}
     <button
       type="button"
       onclick={saveSettings}
