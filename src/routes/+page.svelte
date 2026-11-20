@@ -14,6 +14,7 @@
   import { defaultSettings } from "./defaultSettings.ts";
   import { formatCoordsString } from "../lib/utils/formatCoordsString";
   import { coordsToQDS } from "../lib/utils/coordsToQDS";
+  import { getCurrentDateTime } from "../lib/utils/getCurrentDate";
 
   const ui = getContext<{ showInfo: boolean }>("ui");
 
@@ -25,7 +26,7 @@
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isAndroid = /Android/i.test(navigator.userAgent);
 
-  let coordsPresenter: HTMLParagraphElement | null = $state(null);
+  let coordsPresenter: HTMLDivElement | null = $state(null);
   let coordsString: string | null = $state(null);
   let latitude: number | null = $state(null);
   let longitude: number | null = $state(null);
@@ -83,17 +84,32 @@
           );
 
           if (coordsPresenter) {
-            let coordsPresenterString = `${coordsString} ± ${Math.round(accuracy)}m`;
+            let coordsPresenterHTMLString = `<p class="w-full text-xl font-semibold text-center">${coordsString} ± ${Math.round(accuracy)}m</p>`;
 
+            let coordsPresenterMetaDataValues: string[] = [];
             if (geoSettings.includeDatum) {
-              coordsPresenterString += " WGS84";
+              coordsPresenterMetaDataValues.push("WGS84");
             }
 
             if (geoSettings.includeGrid) {
-              coordsPresenterString += ` ${coordsToQDS(`${latitude}, ${longitude}`)}`;
+              coordsPresenterMetaDataValues.push(
+                coordsToQDS(`${latitude}, ${longitude}`)!,
+              );
             }
 
-            coordsPresenter.innerHTML = coordsPresenterString;
+            if (coordsPresenterMetaDataValues.length > 0) {
+              coordsPresenterHTMLString += `<p class="w-full text-sm text-center">${coordsPresenterMetaDataValues.join(" | ")}</p>`;
+            }
+
+            if (geoSettings.includeDate) {
+              const dateNow = getCurrentDateTime(
+                geoSettings.useSlashesNotDashes,
+                geoSettings.includeTime,
+              );
+              coordsPresenterHTMLString += `<p class="w-full text-sm text-center">${dateNow}</p>`;
+            }
+
+            coordsPresenter.innerHTML = coordsPresenterHTMLString;
           }
 
           locationCountdown = 30;
@@ -264,13 +280,13 @@
         {/if}
       </div>
     {:else}
-      <p
+      <div
         id="coords"
         bind:this={coordsPresenter}
-        class="p-2 border rounded"
+        class="p-2 m-2 w-full md:w-1/3 lg:w-1/5 border rounded"
       >
         Waiting for location...
-      </p>
+      </div>
 
       <button
         onclick={copyCoords}
