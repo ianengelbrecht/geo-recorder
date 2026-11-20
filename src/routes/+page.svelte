@@ -98,7 +98,7 @@
             }
 
             if (coordsPresenterMetaDataValues.length > 0) {
-              coordsPresenterHTMLString += `<p class="w-full text-sm text-center">${coordsPresenterMetaDataValues.join(" | ")}</p>`;
+              coordsPresenterHTMLString += `<p class="w-full text-center">${coordsPresenterMetaDataValues.join(" | ")}</p>`;
             }
 
             if (geoSettings.includeDate) {
@@ -106,7 +106,7 @@
                 geoSettings.useSlashesNotDashes,
                 geoSettings.includeTime,
               );
-              coordsPresenterHTMLString += `<p class="w-full text-sm text-center">${dateNow}</p>`;
+              coordsPresenterHTMLString += `<p class="w-full text-center">${dateNow}</p>`;
             }
 
             coordsPresenter.innerHTML = coordsPresenterHTMLString;
