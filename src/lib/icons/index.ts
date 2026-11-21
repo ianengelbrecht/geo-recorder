@@ -5,5 +5,6 @@ import SunIcon from "./SunIcon.svelte";
 import MoonIcon from "./MoonIcon.svelte";
 import SettingsIcon from "./SettingsIcon.svelte";
 import WarningIcon from "./WarningIcon.svelte";
+import CloseIcon from "./CloseIcon.svelte";
 
-export { CopyIcon, InfoIcon, NextIcon, SunIcon, MoonIcon, SettingsIcon, WarningIcon };
+export { CopyIcon, InfoIcon, NextIcon, SunIcon, MoonIcon, SettingsIcon, WarningIcon, CloseIcon };

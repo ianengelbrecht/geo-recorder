@@ -4,7 +4,7 @@
   import "../app.css";
   import { SvelteToast } from "@zerodevx/svelte-toast";
   import PwaUpdate from "#lib/components/PwaUpdate.svelte";
-  import { InfoIcon } from "#lib/icons/index.ts";
+  import { InfoIcon, CloseIcon } from "#lib/icons/index.ts";
 
   let showSplash = $state(import.meta.env.PROD); // only show the splash screen in production
   let ui = $state({ showInfo: false });
@@ -51,13 +51,16 @@
         Capture geographic coordinates with supporting metadata for use in other
         apps. Simple!
       </p>
-      <button onclick={() => (ui.showInfo = false)}>
-        <InfoIcon />
+      <button
+        class="cursor-pointer"
+        onclick={() => (ui.showInfo = false)}
+      >
+        <CloseIcon />
       </button>
     </div>
   {/if}
   <button
-    class="bottom-4 left-4"
+    class="bottom-4 left-4 cursor-pointer"
     onclick={() => (ui.showInfo = !ui.showInfo)}
   >
     <InfoIcon />
